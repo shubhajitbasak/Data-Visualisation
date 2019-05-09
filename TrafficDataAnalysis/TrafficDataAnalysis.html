@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Shubhajit Basak (#18231026)" />
+
+<meta name="date" content="2019-03-24" />
+
+<title>Traffic Data Analysis</title>
+
+<script src="TrafficDataAnalysis_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="TrafficDataAnalysis_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="TrafficDataAnalysis_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="TrafficDataAnalysis_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="TrafficDataAnalysis_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="TrafficDataAnalysis_files/navigation-1.1/tabsets.js"></script>
+<link href="TrafficDataAnalysis_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="TrafficDataAnalysis_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Traffic Data Analysis</h1>
+<h4 class="author"><em>Shubhajit Basak (#18231026)</em></h4>
+<h4 class="date"><em>24 March 2019</em></h4>
+
+</div>
+
+
+<p>In this assignment we are studying the Real Traffic Data on the N59 just before and at the junction outside the Insight building in the IDA Business park in Dangan. Following figure showsthe exact location -</p>
+<div class="figure">
+<img src="VizPics/img.PNG" />
+
+</div>
+<p>The main road through the junction is the N59. Traffic coming from direction B is from the (North Western) townlands around the N59 and the larger towns of Clifden, Oughterard and Moycullen.</p>
+<ul>
+<li>Traffic turning into A is going to the IDA Business Park, including the Data Science Institute (Insight)</li>
+<li>Traffic turning towards C can head toward the central part of the university campus and Galway city</li>
+<li>Traffic heading towards D can enter the northern part of the university campus at Corrib village. This traffic also goes to the city</li>
+</ul>
+<p>As the excel proided is difficult to parse I have manually created an excel with the same data with four Tabs -</p>
+<ol style="list-style-type: decimal">
+<li>EastBound - contaning the EastBound Vehicle Data as shown below -</li>
+</ol>
+<div class="figure">
+<img src="VizPics/EastBound.png" />
+
+</div>
+<ol start="2" style="list-style-type: decimal">
+<li>WestBound - contaning the WestBound Vehicle Data as shown below -</li>
+</ol>
+<div class="figure">
+<img src="VizPics/WestBound.png" />
+
+</div>
+<ol start="3" style="list-style-type: decimal">
+<li>Vehicle Type - To get the vehicle Class type -</li>
+</ol>
+<div class="figure">
+<img src="VizPics/VehType.png" />
+
+</div>
+<ul>
+<li>I have considered all the Other Goods Vehicle with in single category as OGV and all the different types of Buses as Bus</li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li>Turning Data - As Shown below -</li>
+</ol>
+<div class="figure">
+<img src="VizPics/TurnData.png" />
+
+</div>
+<div id="part-i---determine-the-period-of-traffic-congestion" class="section level3">
+<h3>Part I - Determine the Period of Traffic Congestion</h3>
+<p>To get an idea of the period of traffic congestion at the junction I am considering the number of vehicle counts in both East and West Bound traffic and visualising the same -</p>
+<pre class="r"><code>suppressMessages(require(readxl))
+suppressMessages(require(ggplot2))
+suppressMessages(require(dplyr))
+suppressMessages(require(stringi))
+suppressMessages(require(lubridate))
+suppressMessages(require(tidyr))
+suppressMessages(require(RColorBrewer))
+suppressMessages(require(ggridges))</code></pre>
+<div id="read-the-data--" class="section level4">
+<h4>Read the data -</h4>
+<pre class="r"><code>setwd(&quot;D:/Ratul/MyGit/Data-Visualisation/TrafficDataAnalysis&quot;)
+my_data_eastbound &lt;- read_excel(&quot;Data_Preprocess.xlsx&quot;,sheet = 1)
+my_data_westbound &lt;- read_excel(&quot;Data_Preprocess.xlsx&quot;,sheet = 2)</code></pre>
+<pre class="r"><code>#Extract Day of Week
+dow &lt;- function(x) format(as.Date(x), &quot;%A&quot;)
+#Get the Day of Week in both the data
+my_data_eastbound$day &lt;- dow(my_data_eastbound$Day)
+my_data_westbound$day &lt;- dow(my_data_westbound$Day)</code></pre>
+<p>Lets plot a simple line graph for different days of week -</p>
+<pre class="r"><code>ggplot(data = my_data_eastbound, aes(x=Time, y = Total, fill=day))+
+  geom_bar(stat = &quot;identity&quot;, width=0.8) +
+  scale_x_discrete(breaks=c(&#39;0100&#39;,&#39;0400&#39;,&#39;0800&#39;,&#39;1200&#39;,&#39;1600&#39;,&#39;2000&#39;,&#39;2345&#39;)) +
+  ggtitle(&quot; Eastbound Vehicle Counts Over Time for Different WeekDays&quot;) +
+  labs(caption = &quot;Fig 1&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-4-1.png" /><!-- --></p>
+<pre class="r"><code>ggplot(data = my_data_westbound, aes(x=Time, y = Total, fill=day))+
+  geom_bar(stat = &quot;identity&quot;, width=0.8) +
+  scale_x_discrete(breaks=c(&#39;0100&#39;,&#39;0400&#39;,&#39;0800&#39;,&#39;1200&#39;,&#39;1600&#39;,&#39;2000&#39;,&#39;2345&#39;)) +
+  ggtitle(&quot; WestBound Vehicle Counts Over Time for Different WeekDays&quot;) +
+  labs(caption = &quot;Fig 2&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-4-2.png" /><!-- --></p>
+</div>
+<div id="observation" class="section level4">
+<h4>Observation:</h4>
+<ul>
+<li>We can see there is definitive spikes during 7-8 AM early morning and 4-6 PM evening in both the direction</li>
+<li>The Count is comparatively low in weekend</li>
+<li>There is a spike in Wednesday in Morning for West Bound Traffic, one reason mat be normally transporters ans suppliers delivers their assignments on Wednesday</li>
+</ul>
+<p>Though the graph gives some idea about the peak hours its bit difficult to interpret for individual day, lets try to facet the data by day and get an overall count of traffics in both the way.</p>
+<div id="prepare-the-data-for-east-bound-traffic--" class="section level5">
+<h5>Prepare the data for East Bound Traffic -</h5>
+<pre class="r"><code>my_data_eastbound_upd &lt;- my_data_eastbound %&gt;% select (Day,day,Time,Total,`Cls-1`:`Cls-11`)
+
+# Create Date Time Stamp 
+stri_sub(my_data_eastbound_upd$Time, 3, 2) &lt;- &quot;:&quot;
+my_data_eastbound_upd$DayTime &lt;- ymd_hm(paste(as.character(my_data_eastbound_upd$Day),
+                                              my_data_eastbound_upd$Time))
+# Extract Date
+my_data_eastbound_upd$Date &lt;- date(my_data_eastbound_upd$DayTime)
+
+# Organise the columns
+my_data_eastbound_upd &lt;- my_data_eastbound_upd %&gt;% select(DayTime,Date,day,Total,`Cls-1`:`Cls-11`)
+
+# Get Hourly Sum
+my_data_eastbound_upd.hour.sum &lt;- aggregate(my_data_eastbound_upd[&quot;Total&quot;], 
+                      list(DateTime = cut(my_data_eastbound_upd$DayTime, breaks=&quot;hour&quot;)), 
+                      sum, na.rm = TRUE)
+# Get Date
+my_data_eastbound_upd.hour.sum$Date &lt;- date(my_data_eastbound_upd.hour.sum$DateTime)
+
+# Get the Hour of the Day
+my_data_eastbound_upd.hour.sum$Time &lt;-  hour(my_data_eastbound_upd.hour.sum$DateTime)
+
+# Get the WeekDay
+my_data_eastbound_upd.hour.sum$Day &lt;- dow(my_data_eastbound_upd.hour.sum$DateTime)
+
+# Add AM PM to separate the data into two half
+my_data_eastbound_upd.hour.sum$AMPM[my_data_eastbound_upd.hour.sum$Time &gt;= 0 &amp; my_data_eastbound_upd.hour.sum$Time &lt; 12]&lt;-&quot;AM&quot;
+my_data_eastbound_upd.hour.sum$AMPM[my_data_eastbound_upd.hour.sum$Time &gt;= 12 ]&lt;-&quot;PM&quot;
+my_data_eastbound_upd.hour.sum$AMPM &lt;-factor(my_data_eastbound_upd.hour.sum$AMPM, levels=c(&quot;AM&quot;,&quot;PM&quot;))
+
+#replace 12 pm with 11.99 am
+new.rows&lt;-my_data_eastbound_upd.hour.sum[my_data_eastbound_upd.hour.sum$Time == 12, ] 
+new.rows$AMPM &lt;- &quot;AM&quot;
+new.rows$Time &lt;- 11.9999
+my_data_eastbound_upd.hour.sum.newrows &lt;- rbind(my_data_eastbound_upd.hour.sum, new.rows)</code></pre>
+</div>
+<div id="prepare-the-data-for-west-bound-traffic--" class="section level5">
+<h5>Prepare the data for West Bound Traffic -</h5>
+<pre class="r"><code>my_data_westbound_upd &lt;- my_data_westbound %&gt;% select (Day,day,Time,Total,`Cls-1`:`Cls-11`)
+
+# Create Date Time Stamp 
+stri_sub(my_data_westbound_upd$Time, 3, 2) &lt;- &quot;:&quot;
+my_data_westbound_upd$DayTime &lt;- ymd_hm(paste(as.character(my_data_westbound_upd$Day),
+                                              my_data_westbound_upd$Time))
+# Extract Date
+my_data_westbound_upd$Date &lt;- date(my_data_westbound_upd$DayTime)
+
+# Organise the columns
+my_data_westbound_upd &lt;- my_data_westbound_upd %&gt;% select(DayTime,Date,day,Total,`Cls-1`:`Cls-11`)
+
+# Get Hourly Sum
+my_data_westbound_upd.hour.sum &lt;- aggregate(my_data_westbound_upd[&quot;Total&quot;], 
+                      list(DateTime = cut(my_data_westbound_upd$DayTime, breaks=&quot;hour&quot;)), 
+                      sum, na.rm = TRUE)
+
+# Get Date
+my_data_westbound_upd.hour.sum$Date &lt;- date(my_data_westbound_upd.hour.sum$DateTime)
+
+# Get the Hour of the Day
+my_data_westbound_upd.hour.sum$Time &lt;-  hour(my_data_westbound_upd.hour.sum$DateTime)
+
+# Get the WeekDay
+my_data_westbound_upd.hour.sum$Day &lt;- dow(my_data_westbound_upd.hour.sum$DateTime)
+
+# Add AM PM to separate the data into two half
+my_data_westbound_upd.hour.sum$AMPM[my_data_westbound_upd.hour.sum$Time &gt;= 0 &amp; my_data_westbound_upd.hour.sum$Time &lt; 12]&lt;-&quot;AM&quot;
+my_data_westbound_upd.hour.sum$AMPM[my_data_westbound_upd.hour.sum$Time &gt;= 12 ]&lt;-&quot;PM&quot;
+my_data_westbound_upd.hour.sum$AMPM &lt;-factor(my_data_westbound_upd.hour.sum$AMPM, levels=c(&quot;AM&quot;,&quot;PM&quot;))
+
+#replace 12 pm with 11.99 am
+new.rows&lt;-my_data_westbound_upd.hour.sum[my_data_westbound_upd.hour.sum$Time == 12, ] 
+new.rows$AMPM &lt;- &quot;AM&quot;
+new.rows$Time &lt;- 11.9999
+
+my_data_westbound_upd.hour.sum.newrows &lt;- rbind(my_data_westbound_upd.hour.sum, new.rows)</code></pre>
+</div>
+</div>
+<div id="plot-the-data--" class="section level4">
+<h4>Plot The data -</h4>
+<pre class="r"><code>p &lt;- ggplot(my_data_eastbound_upd.hour.sum.newrows, aes(x = Time,fill=AMPM )) +
+  
+  geom_ridgeline(aes(height = Total, y=0), size=0.2, alpha=0.7) +
+  
+  scale_x_continuous(breaks=c(0,4,8,12,16,20))+
+  scale_y_continuous(name =&quot;VehicleCounts&quot;)+ #breaks=c(0,50,100,150,200,250),
+  
+  geom_vline(aes(xintercept = 7),linetype=&quot;dotted&quot;, colour = &#39;red&#39;, size = 0.2 ) +
+  geom_vline(aes(xintercept = 17),linetype=&quot;dotted&quot;, colour = &#39;red&#39;, size = 0.2 ) +
+  geom_text(label=&quot;7 AM&quot;, x=7, y=800, hjust=-0.2, size=2) +  # title of left line
+  geom_text(label=&quot;5 PM&quot;, x=17, y=800, hjust=-0.2, size=2) + # title of right line
+ 
+  scale_fill_manual(values=c(&quot;goldenrod1&quot;,&quot;cornflowerblue&quot;), name=&quot;ampm&quot;)+
+  
+  #faceted grid view      
+  facet_grid(. ~ Day, switch = &quot;x&quot;)  +
+  
+  theme(axis.title.x=element_blank(), 
+        axis.text.x = element_text(size = 5.5,vjust=6),
+        axis.ticks.x = element_blank(),
+        panel.grid =element_blank(), 
+        panel.background = element_blank(),
+        legend.title = element_blank(),
+        
+        strip.placement = &quot;outside&quot;,
+        strip.text.x = element_text(size=6)
+  ) +
+  ggtitle(&quot;Eastbound Vehicle Counts Over Time for Different WeekDays&quot;) +
+  labs(caption = &quot;Fig 3&quot;)
+
+p</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-7-1.png" /><!-- --></p>
+<pre class="r"><code>p &lt;- ggplot(my_data_westbound_upd.hour.sum.newrows, aes(x = Time,fill=AMPM )) +
+  
+  geom_ridgeline(aes(height = Total, y=0), size=0.2, alpha=0.7) +
+  
+  scale_x_continuous(breaks=c(0,4,8,12,16,20))+
+  scale_y_continuous(name =&quot;VehicleCounts&quot;)+ #breaks=c(0,50,100,150,200,250),
+  
+  geom_vline(aes(xintercept = 7),linetype=&quot;dotted&quot;, colour = &#39;red&#39;, size = 0.2 ) +
+  geom_vline(aes(xintercept = 17),linetype=&quot;dotted&quot;, colour = &#39;red&#39;, size = 0.2 ) +
+  geom_text(label=&quot;7 AM&quot;, x=7, y=800, hjust=-0.2, size=2) +  # title of left line
+  geom_text(label=&quot;5 PM&quot;, x=17, y=800, hjust=-0.2, size=2) + # title of right line
+ 
+  scale_fill_manual(values=c(&quot;goldenrod1&quot;,&quot;cornflowerblue&quot;), name=&quot;ampm&quot;)+
+  
+  #faceted grid view      
+  facet_grid(. ~ Day, switch = &quot;x&quot;)  +
+  
+  theme(axis.title.x=element_blank(), 
+        axis.text.x = element_text(size = 5.5,vjust=6),
+        axis.ticks.x = element_blank(),
+        panel.grid =element_blank(), 
+        panel.background = element_blank(),
+        legend.title = element_blank(),
+        
+        strip.placement = &quot;outside&quot;,
+        strip.text.x = element_text(size=6)
+  ) +
+  ggtitle(&quot;Westbound Vehicle Counts Over Time for Different WeekDays&quot;) +
+  labs(caption = &quot;Fig 4&quot;)
+
+p</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-8-1.png" /><!-- --></p>
+</div>
+<div id="observations" class="section level4">
+<h4>Observations:</h4>
+<ul>
+<li>The above plot Fig 3 &amp; 4 shows the same characteristics as Fig 1 &amp; 2</li>
+<li>The major Traffic in both the direction is around 7-8 AM in the Morning and 4-6 PM in the Evening</li>
+<li>The spike in Wednesday Towards Moycullen is because of the high density of Van and Goods Vehicle may be because of in Wednesday retailers delivers their packages</li>
+</ul>
+</div>
+</div>
+<div id="part-ii---distribution-of-vehicle-types-contributing-to-daily-traffic" class="section level3">
+<h3>Part II - Distribution Of Vehicle Types Contributing to Daily Traffic</h3>
+<div id="read-the-data-to-get-the-vehicle-types" class="section level4">
+<h4>Read the data to Get the Vehicle Types</h4>
+<pre class="r"><code>veh_type_veh_count_data &lt;- read_excel(&quot;Data_Preprocess.xlsx&quot;,sheet = 3)
+veh_type_veh_count_data$VehType &lt;- stri_c(&quot;Cls&quot;,as.character(veh_type_veh_count_data$Class))
+veh_type_veh_count_data</code></pre>
+<pre><code>## # A tibble: 11 x 5
+##    Class Description  `Class in Junction Turning data` CommonClass VehType
+##    &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;                            &lt;chr&gt;       &lt;chr&gt;  
+##  1     1 Cyclist      PCL                              PCL         Cls1   
+##  2     2 M/Cycle      MCL                              MCL         Cls2   
+##  3     3 Car          Car,Taxi                         CAR         Cls3   
+##  4     4 Van          LGV                              LGV         Cls4   
+##  5     5 Rigid 2 Axle OGV1                             OGV         Cls5   
+##  6     6 Rigid 3 Axle OGV1                             OGV         Cls6   
+##  7     7 Rigid 4 Axle OGV2                             OGV         Cls7   
+##  8     8 3 Axle HGv   OGV3                             OGV         Cls8   
+##  9     9 4 Axle HGV   OGV4                             OGV         Cls9   
+## 10    10 5+Axle HGV   OGV5                             OGV         Cls10  
+## 11    11 Bus          CDB, BEB, OB                     BUS         Cls11</code></pre>
+</div>
+<div id="visualise-east-bound-data" class="section level4">
+<h4>Visualise East Bound Data</h4>
+<pre class="r"><code># Summarise after Group by Date
+my_data_eastbound_upd.Veh.Sum &lt;- my_data_eastbound_upd %&gt;% group_by(Date) %&gt;%
+  summarise(Cls1 = sum(`Cls-1`),
+            Cls2 = sum(`Cls-2`),
+            Cls3 = sum(`Cls-3`),
+            Cls4 = sum(`Cls-4`),
+            Cls5 = sum(`Cls-5`),
+            Cls6 = sum(`Cls-6`),
+            Cls7 = sum(`Cls-7`),
+            Cls8 = sum(`Cls-8`),
+            Cls9 = sum(`Cls-9`),
+            Cls10 = sum(`Cls-10`),
+            Cls11 = sum(`Cls-11`)
+            )
+
+# Convert to Tall Format
+my_data_eastbound_upd.Veh.Sum.Tall &lt;- gather(my_data_eastbound_upd.Veh.Sum, &quot;VehType&quot;, &quot;Counts&quot;,Cls1:Cls11)
+
+my_data_eastbound_upd.Veh.Sum.Tall &lt;- merge(my_data_eastbound_upd.Veh.Sum.Tall,veh_type_veh_count_data) %&gt;% select(Date, Description,Counts)
+
+getPalette = brewer.pal(11, &quot;Set3&quot;)
+
+ggplot(my_data_eastbound_upd.Veh.Sum.Tall, aes(x = Date, 
+                                    y=Counts, fill=Description
+                                   )) +
+  geom_bar(stat=&quot;identity&quot;, width=0.8)  +
+  scale_y_continuous(name = &quot;Vehicle Counts&quot;) + 
+  scale_x_date(date_labels = &quot;%d-%b&quot;, breaks = as.Date(c(&quot;2016-11-18&quot;,&quot;2016-11-19&quot;,&quot;2016-11-20&quot;,
+                                                         &quot;2016-11-21&quot;,&quot;2016-11-22&quot;,&quot;2016-11-23&quot;,&quot;2016-11-24&quot;))) +
+  scale_fill_manual(values=getPalette) +
+  ggtitle(&quot;East Bound Daily Vehicle Counts by Type &quot;) +
+  labs(caption = &quot;Fig 7&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-10-1.png" /><!-- --></p>
+<pre class="r"><code>ggplot(data = my_data_eastbound_upd.Veh.Sum.Tall, aes(x = Date, 
+                                          y=Counts, color = Description,
+                                          group = Description)) +
+  geom_point(aes(shape = Description)) +
+  geom_line() +
+  scale_fill_manual(values=getPalette) +
+  scale_shape_manual(values = c(1,2,3,4,5,6,7,8,9,10,11)) +
+  scale_x_date(date_labels = &quot;%d-%b&quot;, breaks = as.Date(c(&quot;2016-11-18&quot;,&quot;2016-11-19&quot;,&quot;2016-11-20&quot;,
+                                                         &quot;2016-11-21&quot;,&quot;2016-11-22&quot;,&quot;2016-11-23&quot;,&quot;2016-11-24&quot;))) +
+  scale_y_continuous(name = &quot;Vehicle Counts&quot;) +
+  ggtitle(&quot;East Bound Daily Vehicle Counts by Type &quot;) +
+  labs(caption = &quot;Fig 8&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-11-1.png" /><!-- --></p>
+</div>
+<div id="observations-1" class="section level4">
+<h4>Observations:</h4>
+<ul>
+<li>We have found the major contributions are from the Van and Car and a little number of 2 Axle Vehicle</li>
+</ul>
+<p>As we have found the other vehicles are not contributing so much in the count I am merging the vehicle type as six categories -</p>
+<ol style="list-style-type: decimal">
+<li>CAR - Includes Car and Taxi</li>
+<li>BUS - Includes all kind of Bus(CDB, BEB and OB)</li>
+<li>LGV - Include Van</li>
+<li>MCL - M/Cycle</li>
+<li>OGV - Includes 2 Axle, 3 Axle, 4 Axle and 5+ Axle</li>
+<li>PCL - Cyclists</li>
+</ol>
+</div>
+<div id="merge-the-data--" class="section level4">
+<h4>Merge the data -</h4>
+<pre class="r"><code>my_data_eastbound_upd.Veh.Sum.Tall.Updt &lt;- merge(my_data_eastbound_upd.Veh.Sum.Tall,veh_type_veh_count_data) %&gt;%  
+  select(Date,CommonClass,Counts) %&gt;%
+  group_by(Date,CommonClass) %&gt;%
+  summarise(Counts = sum(Counts))
+
+head(my_data_eastbound_upd.Veh.Sum.Tall.Updt)</code></pre>
+<pre><code>## # A tibble: 6 x 3
+## # Groups:   Date [1]
+##   Date       CommonClass Counts
+##   &lt;date&gt;     &lt;chr&gt;        &lt;dbl&gt;
+## 1 2016-11-18 BUS             78
+## 2 2016-11-18 CAR           3326
+## 3 2016-11-18 LGV           3562
+## 4 2016-11-18 MCL             12
+## 5 2016-11-18 OGV            320
+## 6 2016-11-18 PCL              3</code></pre>
+<pre class="r"><code>ggplot(my_data_eastbound_upd.Veh.Sum.Tall.Updt, aes(x = Date, 
+                                    y=Counts, fill=CommonClass
+                                   )) +
+  geom_bar(stat=&quot;identity&quot;, width=0.8)  +
+  scale_y_continuous(name = &quot;Vehicle Counts&quot;) + 
+  scale_fill_manual(values=brewer.pal(6, &quot;Set2&quot;)) +
+  scale_x_date(date_labels = &quot;%d-%b&quot;, breaks = as.Date(c(&quot;2016-11-18&quot;,&quot;2016-11-19&quot;,&quot;2016-11-20&quot;,
+                                                         &quot;2016-11-21&quot;,&quot;2016-11-22&quot;,&quot;2016-11-23&quot;,&quot;2016-11-24&quot;))) +
+  # scale_fill_manual(values=getPalette) +
+  ggtitle(&quot;East Bound Daily Vehicle Counts by Type &quot;) +
+  labs(caption = &quot;Fig 9&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-13-1.png" /><!-- --></p>
+</div>
+<div id="observations--" class="section level4">
+<h4>Observations -</h4>
+<ul>
+<li>The major contributors are Car and LGV/Vans</li>
+<li>Other than there are few numbers of OGV vehicles</li>
+</ul>
+</div>
+<div id="repeat-the-same-procedure-for-west-bound-vehicles--" class="section level4">
+<h4>Repeat the same procedure for West Bound Vehicles -</h4>
+<pre class="r"><code>my_data_westbound_upd.Veh.Sum &lt;- my_data_westbound_upd %&gt;% group_by(Date) %&gt;%
+  summarise(Cls1 = sum(`Cls-1`),
+            Cls2 = sum(`Cls-2`),
+            Cls3 = sum(`Cls-3`),
+            Cls4 = sum(`Cls-4`),
+            Cls5 = sum(`Cls-5`),
+            Cls6 = sum(`Cls-6`),
+            Cls7 = sum(`Cls-7`),
+            Cls8 = sum(`Cls-8`),
+            Cls9 = sum(`Cls-9`),
+            Cls10 = sum(`Cls-10`),
+            Cls11 = sum(`Cls-11`)
+            )
+
+my_data_westbound_upd.Veh.Sum.Tall &lt;- gather(my_data_westbound_upd.Veh.Sum, &quot;VehType&quot;, &quot;Counts&quot;,Cls1:Cls11)
+
+my_data_westbound_upd.Veh.Sum.Tall &lt;- merge(my_data_westbound_upd.Veh.Sum.Tall,veh_type_veh_count_data) %&gt;% select(Date, Description,Counts)
+
+getPalette = brewer.pal(11, &quot;Set3&quot;)
+
+ggplot(my_data_westbound_upd.Veh.Sum.Tall, aes(x = Date, 
+                                    y=Counts, fill=Description
+                                   )) +
+  geom_bar(stat=&quot;identity&quot;, width=0.8)  +
+  scale_y_continuous(name = &quot;Vehicle Counts&quot;) + 
+  scale_x_date(date_labels = &quot;%d-%b&quot;, breaks = as.Date(c(&quot;2016-11-18&quot;,&quot;2016-11-19&quot;,&quot;2016-11-20&quot;,
+                                                         &quot;2016-11-21&quot;,&quot;2016-11-22&quot;,&quot;2016-11-23&quot;,&quot;2016-11-24&quot;))) +
+  scale_fill_manual(values=getPalette) +
+  ggtitle(&quot;West Bound Daily Vehicle Counts by Type &quot;) +
+  labs(caption = &quot;Fig 10&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-14-1.png" /><!-- --></p>
+<pre class="r"><code>ggplot(data = my_data_westbound_upd.Veh.Sum.Tall, aes(x = Date, 
+                                          y=Counts, color = Description,
+                                          group = Description)) +
+  geom_point(aes(shape = Description)) +
+  geom_line() +
+  scale_fill_manual(values=getPalette) +
+  scale_shape_manual(values = c(1,2,3,4,5,6,7,8,9,10,11)) +
+  scale_x_date(date_labels = &quot;%d-%b&quot;, breaks = as.Date(c(&quot;2016-11-18&quot;,&quot;2016-11-19&quot;,&quot;2016-11-20&quot;,
+                                                         &quot;2016-11-21&quot;,&quot;2016-11-22&quot;,&quot;2016-11-23&quot;,&quot;2016-11-24&quot;))) +
+  scale_y_continuous(name = &quot;Vehicle Counts&quot;) +
+  ggtitle(&quot;West Bound Daily Vehicle Counts by Type &quot;) +
+  labs(caption = &quot;Fig 11&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-15-1.png" /><!-- --></p>
+<pre class="r"><code>my_data_westbound_upd.Veh.Sum.Tall.Updt &lt;- merge(my_data_westbound_upd.Veh.Sum.Tall,veh_type_veh_count_data) %&gt;%  
+  select(Date,CommonClass,Counts) %&gt;%
+  group_by(Date,CommonClass) %&gt;%
+  summarise(Counts = sum(Counts))
+
+head(my_data_westbound_upd.Veh.Sum.Tall.Updt)</code></pre>
+<pre><code>## # A tibble: 6 x 3
+## # Groups:   Date [1]
+##   Date       CommonClass Counts
+##   &lt;date&gt;     &lt;chr&gt;        &lt;dbl&gt;
+## 1 2016-11-18 BUS             79
+## 2 2016-11-18 CAR           3105
+## 3 2016-11-18 LGV           3652
+## 4 2016-11-18 MCL             16
+## 5 2016-11-18 OGV            350
+## 6 2016-11-18 PCL              5</code></pre>
+<pre class="r"><code>ggplot(my_data_westbound_upd.Veh.Sum.Tall.Updt, aes(x = Date, 
+                                    y=Counts, fill=CommonClass
+                                   )) +
+  geom_bar(stat=&quot;identity&quot;, width=0.8)  +
+  scale_y_continuous(name = &quot;Vehicle Counts&quot;) + 
+  scale_fill_manual(values=brewer.pal(6, &quot;Set2&quot;)) +
+  scale_x_date(date_labels = &quot;%d-%b&quot;, breaks = as.Date(c(&quot;2016-11-18&quot;,&quot;2016-11-19&quot;,&quot;2016-11-20&quot;,
+                                                         &quot;2016-11-21&quot;,&quot;2016-11-22&quot;,&quot;2016-11-23&quot;,&quot;2016-11-24&quot;))) +
+  ggtitle(&quot;West Bound Daily Vehicle Counts by Type &quot;) +
+  labs(caption = &quot;Fig 12&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-17-1.png" /><!-- --></p>
+</div>
+<div id="observations---1" class="section level4">
+<h4>Observations -</h4>
+<ul>
+<li>The West bound data also shows the same trend as East bound</li>
+<li>The major contributors are Car and LGV/Vans</li>
+<li>Other than there are few numbers of OGV vehicles</li>
+</ul>
+</div>
+</div>
+<div id="part-iii---case-supporting-a-regular-bus-service-from-moycullen-to-the-ida-park-and-the-university" class="section level3">
+<h3>Part III - Case supporting a regular bus service from Moycullen to the IDA park and the university</h3>
+<p>First I will read the data provided which have the statistics of vehicles taking turns in the junction shown in the map at the start of this report.</p>
+<p>While merging the data I am considering Taxi and Car as single type, OGV1 and OGV2 as single type OGV</p>
+<pre class="r"><code>turning_data &lt;- read_excel(&quot;Data_Preprocess.xlsx&quot;,sheet = 4)
+
+# Get header data
+turning_header&lt;-c(&quot;Direction&quot;, &quot;DateTime&quot;,as.vector(unname(unlist(turning_data[1,2:11]))))
+# Create a blank dataframe
+mydata_turning &lt;- as.data.frame(matrix(,ncol=12,nrow=0))
+
+# As the data is spreaded over the different direction I will convert it into tall form for all the directions
+n &lt;- 2
+while(n &lt;= 112){
+
+  tempdf &lt;- slice(turning_data,2:n()) %&gt;% select(1,n:(n+9))
+  
+  tempdf &lt;- cbind(Direction=stri_sub(colnames(tempdf)[2],0,6),tempdf)
+  
+  colnames(mydata_turning)&lt;- turning_header
+  tempdf &lt;- unname(tempdf)
+  colnames(tempdf)&lt;- turning_header
+
+  mydata_turning &lt;- rbind(mydata_turning, tempdf)
+
+  n &lt;- n+10
+  
+}
+mydata_turning$Direction &lt;- as.character(mydata_turning$Direction)
+
+mydata_turning[,3:12] = apply(mydata_turning[,3:12], 2, function(x) as.numeric(as.character(x)));
+
+mydata_turning &lt;- mydata_turning %&gt;% mutate(Hour = hour(DateTime))
+
+# Summarise the vehicle counts 
+mydata_turning_hourly &lt;- mydata_turning %&gt;% group_by(Direction,Hour) %&gt;%
+  summarise(
+    PCL = sum(PCL),
+    MCL = sum(MCL),
+    CAR = sum(CAR)+ sum(TAXI),
+    LGV = sum(LGV),
+    OGV = sum(OGV1)+sum(OGV2),
+    CITYBUS = sum(CDB),
+    EIREANNBUS = sum(BEB), 
+    OTHERBUS = sum(OB)
+    
+  )
+
+head(mydata_turning_hourly)</code></pre>
+<pre><code>## # A tibble: 6 x 10
+## # Groups:   Direction [1]
+##   Direction  Hour   PCL   MCL   CAR   LGV   OGV CITYBUS EIREANNBUS OTHERBUS
+##   &lt;chr&gt;     &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+## 1 A =&gt; B        7     0     0     0     0     0       0          0        0
+## 2 A =&gt; B        8     0     0     1     0     0       0          0        0
+## 3 A =&gt; B        9     0     0     3     1     0       0          0        0
+## 4 A =&gt; B       10     0     0     1     1     0       0          0        0
+## 5 A =&gt; B       11     0     0     4     1     0       0          0        0
+## 6 A =&gt; B       12     1     0    15     4     1       0          0        0</code></pre>
+<p>As the data consists of several direction I have created two categories as below -</p>
+<ul>
+<li>Vehicles From Moycullen to DERI/University/City - as per the map view vehicles coming from B -&gt; D, B -&gt; C and B -&gt; A</li>
+<li>Vehicles From DERI/University/City to Moycullen - as per the map view vehicles coming from A -&gt; B, C -&gt; B and D -&gt; B</li>
+</ul>
+<pre class="r"><code>mydata_turning_hourly_fromMoycullen &lt;- mydata_turning_hourly %&gt;% 
+  filter( Direction == &quot;B =&gt; D&quot; || Direction == &quot;B =&gt; C&quot; || Direction == &quot;B =&gt; A&quot; )
+
+mydata_turning_hourly_toMoycullen &lt;- mydata_turning_hourly %&gt;% 
+  filter( Direction == &quot;A =&gt; B&quot; || Direction == &quot;C =&gt; B&quot; || Direction == &quot;D =&gt; B&quot; )
+
+print(&quot;Total Vehicles From Moycullen - &quot;)</code></pre>
+<pre><code>## [1] &quot;Total Vehicles From Moycullen - &quot;</code></pre>
+<pre class="r"><code>print(colSums(Filter(is.numeric,mydata_turning_hourly_fromMoycullen)))</code></pre>
+<pre><code>##       Hour        PCL        MCL        CAR        LGV        OGV 
+##        450         77          2       5520        756        206 
+##    CITYBUS EIREANNBUS   OTHERBUS 
+##          0          5         27</code></pre>
+<pre class="r"><code>print(&quot;Total Vehicles Towards Moycullen - &quot;)</code></pre>
+<pre><code>## [1] &quot;Total Vehicles Towards Moycullen - &quot;</code></pre>
+<pre class="r"><code>print(colSums(Filter(is.numeric,mydata_turning_hourly_toMoycullen)))</code></pre>
+<pre><code>##       Hour        PCL        MCL        CAR        LGV        OGV 
+##        450         62          4       5062        662        188 
+##    CITYBUS EIREANNBUS   OTHERBUS 
+##          0          5         22</code></pre>
+<div id="observations-2" class="section level4">
+<h4>Observations:</h4>
+<ul>
+<li>Seeing the above data counts its clear that there are high volume of Cars (around 5k daily) coming from Moycullen and going opposite direction</li>
+<li>On the contrary there is no City Bus Service in the root</li>
+<li>So if we assume atleast one fourth of the people coming by Car of Other Bus Types will be replaced by the bus service, around 1025 cars and 5 Other Bus can be take off the road</li>
+</ul>
+<p>Lets try to find out the peak times when the volume of cars are maximum -</p>
+<pre class="r"><code>ggplot(data = mydata_turning_hourly_fromMoycullen, aes(x=Hour, y= CAR, fill=Direction))+
+  geom_bar(stat = &quot;identity&quot;, width=0.8) +
+  scale_x_continuous(breaks = c(7,8,9,10,11,12,13,14,15,16,17,18))+
+  xlab(&quot;Hours&quot;)+
+  ylab(&quot;Car Counts&quot;)+
+  ggtitle(&quot;Total Car Counts From Moycullen to City/University&quot;) +
+  labs(caption = &quot;Fig 13&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-20-1.png" /><!-- --></p>
+<pre class="r"><code>ggplot(data = mydata_turning_hourly_toMoycullen, aes(x=Hour, y= CAR, fill=Direction))+
+  geom_bar(stat = &quot;identity&quot;, width=0.8) +
+  scale_x_continuous(breaks = c(7,8,9,10,11,12,13,14,15,16,17,18))+
+  xlab(&quot;Hours&quot;)+
+  ylab(&quot;Car Counts&quot;)+
+  ggtitle(&quot;Total Car Counts From City/University to Moycullen&quot;) +
+  labs(caption = &quot;Fig 14&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-20-2.png" /><!-- --></p>
+</div>
+<div id="observation-1" class="section level4">
+<h4>Observation:</h4>
+<ul>
+<li>From the above graph we can see for the Cars coming from Moycullen the pick hours are 7-9 am and at around 1-3 PM</li>
+<li>For the Cars going towards Moycullen the pick hours are between 4 pm and 6 pm</li>
+</ul>
+<p>As per the observation we canproposed the following Bus Route -</p>
+<table>
+<thead>
+<tr class="header">
+<th>Route</th>
+<th>Timings</th>
+<th>Frequencies</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Moycullen to Galway City Centre through NUIG</td>
+<td>7 AM - 10 AM</td>
+<td>Every 20 Minutes</td>
+</tr>
+<tr class="even">
+<td>-Do-</td>
+<td>Rest of the Day</td>
+<td>Every 1 Hour</td>
+</tr>
+<tr class="odd">
+<td>Galway City Centre to Moycullen through NUIG</td>
+<td>4 PM - 7 PM</td>
+<td>Every 20 Minutes</td>
+</tr>
+<tr class="even">
+<td>-Do-</td>
+<td>Rest of the Day</td>
+<td>Every 1 Hour</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+</div>
+<div id="part-iv---case-supporting-a-greenway-cycle-path-from-moycullen-to-galway-via-nuig" class="section level3">
+<h3>Part IV - Case Supporting a greenway cycle path from Moycullen to Galway via NUIG</h3>
+<pre class="r"><code>print(&quot;Total Vehicle Counts - &quot;)</code></pre>
+<pre><code>## [1] &quot;Total Vehicle Counts - &quot;</code></pre>
+<pre class="r"><code>print(colSums(Filter(is.numeric,mydata_turning_hourly)))</code></pre>
+<pre><code>##       Hour        PCL        MCL        CAR        LGV        OGV 
+##       1800        285          7      12905       1602        411 
+##    CITYBUS EIREANNBUS   OTHERBUS 
+##          5         32         50</code></pre>
+<pre class="r"><code>print(&quot;Total Vehicle Counts From Moycullen - &quot;)</code></pre>
+<pre><code>## [1] &quot;Total Vehicle Counts From Moycullen - &quot;</code></pre>
+<pre class="r"><code>print(colSums(Filter(is.numeric,mydata_turning_hourly_fromMoycullen)))</code></pre>
+<pre><code>##       Hour        PCL        MCL        CAR        LGV        OGV 
+##        450         77          2       5520        756        206 
+##    CITYBUS EIREANNBUS   OTHERBUS 
+##          0          5         27</code></pre>
+<pre class="r"><code>print(&quot;Total Vehicle Counts Towards Moycullen - &quot;)</code></pre>
+<pre><code>## [1] &quot;Total Vehicle Counts Towards Moycullen - &quot;</code></pre>
+<pre class="r"><code>print(colSums(Filter(is.numeric,mydata_turning_hourly_toMoycullen)))</code></pre>
+<pre><code>##       Hour        PCL        MCL        CAR        LGV        OGV 
+##        450         62          4       5062        662        188 
+##    CITYBUS EIREANNBUS   OTHERBUS 
+##          0          5         22</code></pre>
+<div id="observation-2" class="section level4">
+<h4>Observation</h4>
+<ul>
+<li>So from the above data its clear that the Moycullen Route is the major contributor of the total cyclists count</li>
+</ul>
+<p>Lets try to support this fact through visualization -</p>
+<pre class="r"><code>ggplot(data = mydata_turning_hourly_fromMoycullen, aes(x=Hour, y= PCL, fill=Direction))+
+  geom_bar(stat = &quot;identity&quot;, width=0.8) +
+  scale_x_continuous(breaks = c(7,8,9,10,11,12,13,14,15,16,17,18))+
+  xlab(&quot;Hours&quot;)+
+  ylab(&quot;Cyclist Counts&quot;)+
+  ggtitle(&quot;Total Cyclist Counts From Moycullen to City/University&quot;) +
+  labs(caption = &quot;Fig 15&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-22-1.png" /><!-- --></p>
+<pre class="r"><code>ggplot(data = mydata_turning_hourly_toMoycullen, aes(x=Hour, y= PCL, fill=Direction))+
+  geom_bar(stat = &quot;identity&quot;, width=0.8) +
+  scale_x_continuous(breaks = c(7,8,9,10,11,12,13,14,15,16,17,18))+
+  xlab(&quot;Hours&quot;)+
+  ylab(&quot;Cyclist Counts&quot;)+
+  ggtitle(&quot;Total Cyclist Counts From City/University to Moycullen&quot;) +
+  labs(caption = &quot;Fig 16&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-22-2.png" /><!-- --></p>
+<pre class="r"><code>ggplot(data = mydata_turning_hourly , aes(x=Hour, y= PCL, fill=Direction))+
+  geom_bar(stat = &quot;identity&quot;, width=0.8) +
+  scale_x_continuous(breaks = c(7,8,9,10,11,12,13,14,15,16,17,18))+
+  xlab(&quot;Hours&quot;)+
+  ylab(&quot;Cyclist Counts&quot;)+
+  ggtitle(&quot;Overall Cyclist Counts in the Given Junction&quot;) +
+  labs(caption = &quot;Fig 17&quot;)</code></pre>
+<p><img src="TrafficDataAnalysis_files/figure-html/unnamed-chunk-22-3.png" /><!-- --></p>
+</div>
+<div id="observations---2" class="section level4">
+<h4>Observations -</h4>
+<ul>
+<li>From both the Fig 15 and Fig 16 we can see the Major contributor of the cycles coming to and from Moycullen are those coming towards NUIG</li>
+<li>From Fig 17 its more evident that if we consider the total number of cyclists in the junction then also the major portions are B-&gt;D or D-&gt;B i.e. - cyclists coming to or from Moycullen and NUIG</li>
+<li>So these supports for a Green Cycle Path Between Moycullen and NUIG</li>
+<li>Also this may reduce the Bus counts as shown under Other Bus category</li>
+</ul>
+</div>
+</div>
+<div id="conclusion--" class="section level3">
+<h3>Conclusion -</h3>
+<p>So we have seen overall the traffic congestion is high during 7-9 am in the morning and 4-6 pm in the evening, which needs to be addressed. Alsowe have found though there are lots of commutators coming from Moycullen there is a very less amount of Eireann Bus and no City Bus in this route. So starting new bus service will definitly reduce the traffic in this route.</p>
+<p></br></br> </br> </br></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
